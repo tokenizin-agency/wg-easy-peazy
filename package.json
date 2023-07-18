@@ -1,0 +1,26 @@
+{
+    "name": "wg-easy-wrapper",
+    "version": "1.0.0",
+    "description": "Convenient Node module for interacting with the wg-easy API",
+    "main": "index.js",
+    "keywords": [
+        "wg",
+        "wg-easy",
+        "wireguard",
+        "api",
+        "wrapper"
+    ],
+    "author": "i3ladik",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/i3ladik/wg-easy-node-wrapper.git"
+    },
+    "bugs": {
+        "url": "https://github.com/i3ladik/wg-easy-node-wrapper/issues"
+    },
+    "homepage": "https://github.com/i3ladik/wg-easy-node-wrapper#readme",
+    "dependencies": {
+        "axios": "^1.4.0"
+    }
+}
