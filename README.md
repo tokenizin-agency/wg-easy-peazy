@@ -10,47 +10,37 @@ Install it from npm:
 npm install wg-easy-wrapper
 ```
 
+# Error Handling
+
+When a request encounters an error, the response will contain an object with the variable "**error**" This object will provide relevant information about the error
+Example: `{ error: 'The name wg-easy is already taken' }`
+
 # Usage
 
-### Create a new WGEasyWrapper object
+### Create a new instance of the WGEasyWrapper class
 
  ```
 const WGEasyWrapper = require('wg-easy-wrapper');
 
-const WGEW = new WGEasyWrapper('https://website.com', 'password_example');
+const wgEasy = new WGEasyWrapper('https://website.com', 'password_example');
 ```
 
 ### Getting the release version
 ```
-const response = await WGEW.getRelease();
-console.log(response);
-```
-
-```
-7
+await wgEasy.getRelease();
+// 7
 ```
 
 ### Getting a session
 ```
-const response = await WGEW.getSession();
-console.log(response);
-```
-
-```
-{
-    requiresPassword: true,
-    authenticated: true
-}
+await wgEasy.getSession();
+// { requiresPassword: true, authenticated: true }
 ```
 
 ### Creating a wg-easy client
 ```
-const response = await WGEW.create('newClient');
-console.log(response);
-```
-
-```
-{
+await wgEasy.create('newClient');
+/*{
   id: '721f6ac2-ab4f-2fz2-v1b4-2gtc93462099',
   name: 'newClient',
   enabled: true,
@@ -62,32 +52,20 @@ console.log(response);
   latestHandshakeAt: null,
   transferRx: 0,
   transferTx: 0
-}
-
-Or
-
-Сlient with name newClient already exists
+}*/
 ```
 
 ### Deleting a wg-easy client
 ```
-const response = await WGEW.delete('721f6ac2-ab4f-2fz2-v1b4-2gtc93462099');
-console.log(response);
-```
-
-```
-true
+await wgEasy.delete('721f6ac2-ab4f-2fz2-v1b4-2gtc93462099');
+// { message: 'Deleted' }
 ```
 
 ### Getting wg-easy clients
 
 ```
-const response = await WGEW.getClients();
-console.log(response);
-```
-
-```
-[
+await wgEasy.getClients();
+/*[
   {
     id: 'f2t3bdbh-b340-4e7d-62f7-651a0122bc62',
     name: 'testName',
@@ -104,17 +82,14 @@ console.log(response);
   {
      ...
   }
-]
+]*/
 ```
 
 ### Getting wg-easy client configuration
 
 ```
-const response = await WGEW.getConfig('f2t3bdbh-b340-4e7d-62f7-651a0122bc62');
-console.log(response);
-```
-
-```
+await wgEasy.getConfig('f2t3bdbh-b340-4e7d-62f7-651a0122bc62');
+/*
 [Interface]
 PrivateKey = ...
 Address = 10.8.0.0/24
@@ -127,80 +102,51 @@ PresharedKey = ...
 AllowedIPs = 0.0.0.0/0, ::/0
 PersistentKeepalive = 0
 Endpoint = website.com:51820
+*/
 ```
 
 ### Getting wg-easy client qr-code
 
 ```
-const response = await WGEW.getQRCode('f2t3bdbh-b340-4e7d-62f7-651a0122bc62');
-console.log(response);
-```
-
-```
+await wgEasy.getQRCode('f2t3bdbh-b340-4e7d-62f7-651a0122bc62');
+/*
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 77 77" shape-rendering="crispEdges">
     <path fill="#ffffff" d="M0 0h77v77H0z"/>
     <path stroke="#000000" d="M4 ... 0h2m2 0h1"/>
 </svg>
+*/
 ```
 
 ### Enable wg-easy client
 ```
-const response = await WGEW.enable('f2t3bdbh-b340-4e7d-62f7-651a0122bc62');
-console.log(response);
-```
-
-```
-true
+await wgEasy.enable('f2t3bdbh-b340-4e7d-62f7-651a0122bc62');
+// { message: 'Enabled' }
 ```
 
 
 ### Disable wg-easy client
 ```
-const response = await WGEW.disable('f2t3bdbh-b340-4e7d-62f7-651a0122bc62');
-console.log(response);
-```
-
-```
-true
+await wgEasy.disable('f2t3bdbh-b340-4e7d-62f7-651a0122bc62');
+// // { message: 'Disabled' }
 ```
 
 ### Rename wg-easy client
 ```
-const response = await WGEW.rename('f2t3bdbh-b340-4e7d-62f7-651a0122bc62', 'newName');
-console.log(response);
-```
-
-```
-The name newName is already taken
-
-Or
-
-true
+await wgEasy.rename('f2t3bdbh-b340-4e7d-62f7-651a0122bc62', 'newName');
+// { message: 'Renamed' }
 ```
 
 ### Update wg-easy client address
 ```
-const response = await WGEW.updateAddress('f2t3bdbh-b340-4e7d-62f7-651a0122bc62', '10.8.0.1');
-console.log(response);
-```
-
-```
-Address is already occupied
-
-Or
-
-true
+await wgEasy.updateAddress('f2t3bdbh-b340-4e7d-62f7-651a0122bc62', '10.8.0.1');
+// { message: 'Address updated' }
 ```
 
 
 ### Find wg-easy client
 ```
-const response = await WGEW.find('newName'); || const response = await WGEW.find('f2t3bdbh-b340-4e7d-62f7-651a0122bc62');
-console.log(response);
-```
-
-```
-{
+await wgEasy.find('newName'); // or id or addres
+/*{
   id: 'f2t3bdbh-b340-4e7d-62f7-651a0122bc62',
   name: 'newName',
   enabled: true,
@@ -212,11 +158,7 @@ console.log(response);
   latestHandshakeAt: null,
   transferRx: 0,
   transferTx: 0
-}
-
-Or
-
-Client not found
+}*/
 ```
 
 # License

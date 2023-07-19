@@ -17,3 +17,13 @@
 
 ### Fix
 * rename(clientId, newName) - now it is not possible to take an existing name
+
+# 1.0.3 (2023-07-20)
+
+### Fix
+
+* rename(clientId, newName) - Added a missed "await"
+
+### Update
+
+* Reworked catching errors. Now, in case of errors, you get an object with the variable "error"

@@ -1,5 +1,8 @@
 const axios = require('axios');
 
+const idRegex = /.+-.{4}-.{4}-.{4}-.+/;
+const addressRegex = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/;
+
 /**
 * WGEasyWrapper class
 */
@@ -36,7 +39,7 @@ class WGEasyWrapper {
             const { status } = error.response;
             const originalRequest = error.config;
 
-            if (status !== 401) throw new Error(error);
+            if (status !== 401) return Promise.reject(error);
 
             try {
                 if (authRetryCount < maxAuthRetries) {
@@ -55,12 +58,15 @@ class WGEasyWrapper {
 
     /**
     * Getting the release version
-    * @returns {Promise<Number>}
+    * @returns {Promise<Object|Number>}
     * @async
     */
     async getRelease() {
-        const { data } = await this.api.get('/api/release');
-        return data;
+        return await this.api.get('/api/release').then(res => {
+            return res.data;
+        }).catch(err => {
+            return err.response.data;
+        });
     }
 
     /**
@@ -69,104 +75,131 @@ class WGEasyWrapper {
     * @async
     */
     async getSession() {
-        const { data } = await this.api.get('/api/session');
-        return data;
+        return await this.api.get('/api/session').then(res => {
+            return res.data;
+        }).catch(err => {
+            return err.response.data;
+        });
     }
 
     /**
     * Getting wg-easy clients
-    * @returns {Promise<Array>}
+    * @returns {Promise<Array|Object>}
     * @async
     */
     async getClients() {
-        const { data } = await this.api.get('/api/wireguard/client/');
-        return data;
+        return await this.api.get('/api/wireguard/client/').then(res => {
+            return res.data;
+        }).catch(err => {
+            return err.response.data;
+        });
     }
 
     /**
     * Getting wg-easy client configuration
     * @param {string} clientId - client id. It may look like f2t3bdbh-b340-4e7d-62f7-651a0122bc62
-    * @returns {Promise<String>}
+    * @returns {Promise<Object|String>}
     * @async
     */
     async getConfig(clientId) {
-        const { data } = await this.api.get(`/api/wireguard/client/${clientId}/configuration`);
-        return data;
+        return await this.api.get(`/api/wireguard/client/${clientId}/configuration`).then(res => {
+            return res.data;
+        }).catch(err => {
+            return err.response.data;
+        });
     }
 
     /**
     * Getting wg-easy client qr-code
     * @param {string} clientId - client id. It may look like f2t3bdbh-b340-4e7d-62f7-651a0122bc62
-    * @returns {Promise<String>}
+    * @returns {Promise<Object|String>}
     * @async
     */
     async getQRCode(clientId) {
-        const { data } = await this.api.get(`/api/wireguard/client/${clientId}/qrcode.svg`);
-        return data;
+        return await this.api.get(`/api/wireguard/client/${clientId}/qrcode.svg`).then(res => {
+            return res.data;
+        }).catch(err => {
+            return err.response.data;
+        });
     }
 
     /**
     * Enable wg-easy client
     * @param {string} clientId - client id. It may look like f2t3bdbh-b340-4e7d-62f7-651a0122bc62
-    * @returns {Promise<Boolean>}
+    * @returns {Promise<Object>}
     * @async
     */
     async enable(clientId) {
-        await this.api.post(`/api/wireguard/client/${clientId}/enable`);
-        return true;
+        return await this.api.post(`/api/wireguard/client/${clientId}/enable`).then(() => {
+            return { message: 'Enabled' };
+        }).catch(err => {
+            return err.response.data;
+        });
     }
 
     /**
     * Disable wg-easy client
     * @param {string} clientId - client id. It may look like f2t3bdbh-b340-4e7d-62f7-651a0122bc62
-    * @returns {Promise<Boolean>}
+    * @returns {Promise<Object>}
     * @async
     */
     async disable(clientId) {
-        await this.api.post(`/api/wireguard/client/${clientId}/disable`);
-        return true;
+        return await this.api.post(`/api/wireguard/client/${clientId}/disable`).then(() => {
+            return { message: 'Disabled' };
+        }).catch(err => {
+            return err.response.data;
+        });
     }
 
     /**
     * Rename wg-easy client
     * @param {string} clientId - client id. It may look like f2t3bdbh-b340-4e7d-62f7-651a0122bc62
     * @param {string} newName - new name
-    * @returns {Promise<Boolean|String>}
+    * @returns {Promise<Object>}
     * @async
     */
     async rename(clientId, newName) {
-        const check = this.find(newName);
-        if (check) return `The name ${newName} is already taken`;
-        await this.api.put(`/api/wireguard/client/${clientId}/name`, { name: newName });
-        return true;
+        if (addressRegex.test(newName)) return { error: `The name ${newName} is forbidden. Looks like an IP` };
+        else if (idRegex.test(newName)) return { error: `The name ${newName} is forbidden. Looks like an ID` };
+
+        const check = await this.find(newName);
+        if (!check.error) return { error: `The name ${newName} is already taken` };
+
+        return await this.api.put(`/api/wireguard/client/${clientId}/name`, { name: newName }).then(() => {
+            return { message: 'Renamed' };
+        }).catch(err => {
+            return err.response.data;
+        });
     }
 
     /**
     * Update wg-easy client address
     * @param {string} clientId - client id. It may look like f2t3bdbh-b340-4e7d-62f7-651a0122bc62
     * @param {string} address - new address
-    * @returns {Promise<Boolean|String>}
+    * @returns {Promise<Object>}
     * @async
     */
     async updateAddress(clientId, address) {
-        const clients = await this.getClients();
-        const check = clients.find(c => c.address === address);
-        if (check) return 'Address is already occupied';
-        await this.api.put(`/api/wireguard/client/${clientId}/address`, { address });
-        return true;
+        const check = await this.find(address);
+        if (!check.error) return { error: `The address ${address} is already occupied` };
+        return await this.api.put(`/api/wireguard/client/${clientId}/address`, { address }).then(() => {
+            return { message: 'Address updated' };
+        }).catch(err => {
+            return err.response.data;
+        });
     }
 
     /**
     * Find wg-easy client
-    * @param {string} client - client id or client name
-    * @returns {Promise<String|Object>}
+    * @param {string} client - client id or client name or client address
+    * @returns {Promise<Object>}
     * @async
     */
     async find(client) {
         const clients = await this.getClients();
-        client = clients.find(c => c.id === client || c.name === client);
-        if (!client) return 'Client not found';
-        else return client;
+        const search = clients.find(c => c.id === client || c.name === client || c.address === client);
+        if (!search) return { error: `Client ${client} not found` };
+        else return search;
     }
 
     /**
@@ -176,22 +209,27 @@ class WGEasyWrapper {
     * @async
     */
     async create(name) {
-        name = name.toString();
         const check = await this.find(name);
-        if (typeof check === 'object') return `Сlient with name ${name} already exists`;
-        await this.api.post('/api/wireguard/client/', { name });
-        return await this.find(name);
+        if (!check.error) return { error: `Сlient ${name} already exists` };
+        return await this.api.post('/api/wireguard/client/', { name }).then(res => {
+            return res.data;
+        }).catch(err => {
+            return err.response.data;
+        });
     }
 
     /**
     * Deleting a wg-easy client
     * @param {string} clientId - client id. It may look like f2t3bdbh-b340-4e7d-62f7-651a0122bc62
-    * @returns {Promise<Boolean>}
+    * @returns {Promise<Object|String>}
     * @async
     */
     async delete(clientId) {
-        await this.api.delete(`/api/wireguard/client/${clientId}`);
-        return true;
+        return await this.api.delete(`/api/wireguard/client/${clientId}`).then(() => {
+            return { message: 'Deleted' };
+        }).catch(err => {
+            return err.response.data;
+        });
     }
 }
 
