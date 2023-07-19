@@ -1,6 +1,6 @@
 {
     "name": "wg-easy-wrapper",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "Convenient Node module for interacting with the wg-easy API",
     "main": "index.js",
     "keywords": [

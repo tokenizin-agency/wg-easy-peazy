@@ -54,6 +54,26 @@ class WGEasyWrapper {
     }
 
     /**
+    * Getting the release version
+    * @returns {Promise<Number>}
+    * @async
+    */
+    async getRelease() {
+        const { data } = await this.api.get('/api/release');
+        return data;
+    }
+
+    /**
+    * Getting a session
+    * @returns {Promise<Object>}
+    * @async
+    */
+    async getSession() {
+        const { data } = await this.api.get('/api/session');
+        return data;
+    }
+
+    /**
     * Getting wg-easy clients
     * @returns {Promise<Array>}
     * @async
@@ -71,6 +91,17 @@ class WGEasyWrapper {
     */
     async getConfig(clientId) {
         const { data } = await this.api.get(`/api/wireguard/client/${clientId}/configuration`);
+        return data;
+    }
+
+    /**
+    * Getting wg-easy client qr-code
+    * @param {string} clientId - client id. It may look like f2t3bdbh-b340-4e7d-62f7-651a0122bc62
+    * @returns {Promise<String>}
+    * @async
+    */
+    async getQRCode(clientId) {
+        const { data } = await this.api.get(`/api/wireguard/client/${clientId}/qrcode.svg`);
         return data;
     }
 
@@ -100,11 +131,28 @@ class WGEasyWrapper {
     * Rename wg-easy client
     * @param {string} clientId - client id. It may look like f2t3bdbh-b340-4e7d-62f7-651a0122bc62
     * @param {string} newName - new name
-    * @returns {Promise<Boolean>}
+    * @returns {Promise<Boolean|String>}
     * @async
     */
     async rename(clientId, newName) {
-        await this.api.put(`/api/wireguard/client/${clientId}/name`, { name: newName.toString() });
+        const check = this.find(newName);
+        if (check) return `The name ${newName} is already taken`;
+        await this.api.put(`/api/wireguard/client/${clientId}/name`, { name: newName });
+        return true;
+    }
+
+    /**
+    * Update wg-easy client address
+    * @param {string} clientId - client id. It may look like f2t3bdbh-b340-4e7d-62f7-651a0122bc62
+    * @param {string} address - new address
+    * @returns {Promise<Boolean|String>}
+    * @async
+    */
+    async updateAddress(clientId, address) {
+        const clients = await this.getClients();
+        const check = clients.find(c => c.address === address);
+        if (check) return 'Address is already occupied';
+        await this.api.put(`/api/wireguard/client/${clientId}/address`, { address });
         return true;
     }
 

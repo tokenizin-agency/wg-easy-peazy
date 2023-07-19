@@ -20,6 +20,29 @@ const WGEasyWrapper = require('wg-easy-wrapper');
 const WGEW = new WGEasyWrapper('https://website.com', 'password_example');
 ```
 
+### Getting the release version
+```
+const response = await WGEW.getRelease();
+console.log(response);
+```
+
+```
+7
+```
+
+### Getting a session
+```
+const response = await WGEW.getSession();
+console.log(response);
+```
+
+```
+{
+    requiresPassword: true,
+    authenticated: true
+}
+```
+
 ### Creating a wg-easy client
 ```
 const response = await WGEW.create('newClient');
@@ -106,6 +129,20 @@ PersistentKeepalive = 0
 Endpoint = website.com:51820
 ```
 
+### Getting wg-easy client qr-code
+
+```
+const response = await WGEW.getQRCode('f2t3bdbh-b340-4e7d-62f7-651a0122bc62');
+console.log(response);
+```
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 77 77" shape-rendering="crispEdges">
+    <path fill="#ffffff" d="M0 0h77v77H0z"/>
+    <path stroke="#000000" d="M4 ... 0h2m2 0h1"/>
+</svg>
+```
+
 ### Enable wg-easy client
 ```
 const response = await WGEW.enable('f2t3bdbh-b340-4e7d-62f7-651a0122bc62');
@@ -134,6 +171,24 @@ console.log(response);
 ```
 
 ```
+The name newName is already taken
+
+Or
+
+true
+```
+
+### Update wg-easy client address
+```
+const response = await WGEW.updateAddress('f2t3bdbh-b340-4e7d-62f7-651a0122bc62', '10.8.0.1');
+console.log(response);
+```
+
+```
+Address is already occupied
+
+Or
+
 true
 ```
 
