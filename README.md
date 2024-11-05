@@ -164,4 +164,4 @@ await wgEasy.find('newName'); // or id or addres
 
 # License
 
-This project is licensed under the [**MIT License**](https://github.com/i3ladik/wg-easy-node-wrapper/blob/main/LICENSE). You are free to modify and distribute the code as per the terms of the license.
+This project is licensed under the [**MIT License**](https://github.com/tokenizin-agency/wg-easy-peazy/blob/main/LICENSE). You are free to modify and distribute the code as per the terms of the license.
