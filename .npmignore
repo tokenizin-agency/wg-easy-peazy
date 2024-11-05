@@ -1,5 +1,4 @@
-**/*
-!index.js
-!CHANGELOG.md
-!LICENSE
-!README.md
+node_modules
+src
+tsconfig.json
+.gitignore

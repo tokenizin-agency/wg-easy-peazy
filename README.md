@@ -1,13 +1,13 @@
-# wg-easy-wrapper
+# wg-easy-peazy
 
-Convenient Node module for interacting with the [wg-easy](https://github.com/wg-easy/wg-easy) API
+Convenient TypeScript compatible library for interacting with the [wg-easy](https://github.com/wg-easy/wg-easy) API
 
 # Installation
 
 Install it from npm:
 
  ```
-npm install wg-easy-wrapper
+npm/yarn/bun install wg-easy-peazy
 ```
 
 # Error Handling
@@ -20,15 +20,16 @@ Example: `{ error: 'The name wg-easy is already taken' }`
 ### Create a new instance of the WGEasyWrapper class
 
  ```
-const WGEasyWrapper = require('wg-easy-wrapper');
+import WGEasyWrapper from 'wg-easy-peazy';
+// const WGEasyWrapper = require('wg-easy-peazy'); // for node
 
-const wgEasy = new WGEasyWrapper('https://website.com', 'password_example');
+const wgEasy = new WGEasyWrapper('https://website.com:51820', 'password_example');
 ```
 
 ### Getting the release version
 ```
 await wgEasy.getRelease();
-// 7
+// 
 ```
 
 ### Getting a session
